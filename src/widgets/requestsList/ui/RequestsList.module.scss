@@ -1,0 +1,15 @@
+.RequestsList {
+	display: block;
+	.link-cell {
+		cursor: pointer;
+	}
+	.link-cell:hover {
+		opacity: .8;
+	}
+	.link-row {
+		transition: .2 all ease;
+	}
+	.link-row:has(.link-cell:hover) {
+		background-color: gray;
+	}
+}

@@ -1,0 +1,63 @@
+.Button {
+    cursor: pointer;
+    color: var(--primary-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.clear {
+    padding: 0;
+    border: none;
+    background: none;
+    outline: none;
+}
+
+.remove, .simple {
+    height: 42px;
+    font: var(--main-font);
+    border: 1px solid var(--primary-color);
+    background: var(--bg-color);
+    color: var(--primary-color);
+    padding: 0 26px;
+    cursor: pointer;
+    @apply rounded-md;
+}
+
+.accent {
+    width: 100%;
+    border-radius: var(--common-border-radius-s);
+    background-color: transparent;
+    color: var(--accent-color);
+    border: 2px solid var(--secondary-color);
+    font: var(--font-m);
+    padding-top: 6px;
+    padding-bottom: 6px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: .7;
+    transition: .2s opacity ease;
+    font-weight: 700;
+}
+.accent:hover{
+    opacity: 1;
+    background-color: rgba(255, 255, 255, .1);
+    font-weight: 500;
+}
+
+.simple:hover {
+    background-color: var(--secondary-color);
+    color: var(--inverted-primary-color);
+}
+
+.simple:active {
+    background-color: #225D7D;
+    color: var(--select-color);
+    color: var(--accent-color);
+}
+
+.remove:hover {
+    background-color: var(--colors-interface-alarm);
+    color: var(--inverted-primary-color);
+}

@@ -1,0 +1,13 @@
+.Requests {
+    display: block;
+    .count-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        max-width: 10%;
+        width: 100%;
+    }
+    .count-button > div {
+        min-width: auto;
+    }
+}

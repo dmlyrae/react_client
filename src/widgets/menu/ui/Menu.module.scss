@@ -1,0 +1,12 @@
+.admin-menu {
+    position: fixed!important;
+    top: 50px!important;
+    right: 50px!important;
+    &__icon {
+        width: 4em;
+        height: 4em;
+        fill: red;
+        stroke: red;
+        color: green;
+    }
+}

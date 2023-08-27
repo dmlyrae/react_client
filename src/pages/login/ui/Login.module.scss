@@ -1,0 +1,11 @@
+.Login {
+	&__form {
+		display: flex;
+		width: 300px;
+		flex-direction: column;
+		gap: 20px;
+		input {
+			width: 100%;
+		}
+	}
+}
