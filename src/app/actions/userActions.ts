@@ -1,14 +1,13 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
 import api from "src/shared/api/api";
-import { apiUrl } from "src/shared/api/data";
 import { getErrorMessage } from "src/shared/api/getErrorMessage";
-import { getCookie, removeCookie, setCookie } from "src/shared/lib/cookie/cookie"
+import { removeCookie, setCookie } from "src/shared/lib/cookie/cookie"
 
 export const checkLocalAuthParams = createAsyncThunk(
 	'user/checkLocal',
-	async (anyParams:any,thunkAPI) => {
+	async (u:any,thunkAPI) => {
 		try {
+			if (u) { console.log(u); }
 			const btoa = localStorage.getItem('btoa');
 			if (!btoa) return;
 			return {
@@ -22,18 +21,15 @@ export const checkLocalAuthParams = createAsyncThunk(
 
 export const userAuthByJWT = createAsyncThunk(
 	'user/jwtauth',
-	async (undefined, thunkAPI) => {
+	async (u:any, thunkAPI) => {
 		try {
+			if (u) { console.log(u); }
 			const response:any = await api.checkJWT()
-			console.log('response jwt', response )
 			const { user } = response;
 			if (user) {
 				return {user, error: false}
 			}
-			return {
-				user: null,
-				error: true,
-			}
+			throw new Error("JWT auth failed")
 		} catch (e:Error|unknown) {
 			console.error('error')
 			return thunkAPI.rejectWithValue(getErrorMessage(e))
@@ -107,10 +103,11 @@ export const toggleTheme = createAsyncThunk(
 
 export const userGetAll = createAsyncThunk(
 	'user/get',
-	async (u:undefined, thunkAPI) => {
+	async (u:any, thunkAPI) => {
 		try {
+			if (u) {console.log(u)}
 			const response = await api.getAllUsers();
-			console.log(response)
+			return response;
 		} catch (e:any) {
 			return thunkAPI.rejectWithValue(e.message)
 		}

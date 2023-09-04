@@ -16,9 +16,11 @@ import MicrowaveIcon from '@mui/icons-material/Microwave';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import ArchiveIcon from '@mui/icons-material/Archive';
 import { adminSlice } from 'src/app/reducers/AdminSlice';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import GroupIcon from '@mui/icons-material/Group';
 import ChecklistRtlIcon from '@mui/icons-material/ChecklistRtl';
+import LogoutIcon from '@mui/icons-material/Logout';
+import { userSlice } from 'src/app/reducers/UsersSlice';
 
 const icons = {
 	"Create User": <PersonAddIcon />,
@@ -28,6 +30,7 @@ const icons = {
 	"Statistics": <ArchiveIcon />,
 	"Charts": <ArchiveIcon />,
 	"Archive": <MailIcon />,
+	"Logout": <LogoutIcon />,
 } as const;
 
 type TIconsNames = keyof typeof icons;
@@ -53,6 +56,10 @@ export function Menu() {
 	}
 
 	const toggleAdminTab = (n:number) => {
+		if (n === 7) {
+			dispatch(userSlice.actions.logout())
+			return;
+		} 
 		dispatch(adminSlice.actions.changeTab(n))
 		navigate('/admin')
 	}
@@ -105,7 +112,7 @@ export function Menu() {
 											</ListItemButton>
 										</ListItem>
 										{
-											index === 3 && (
+											(index === 3 || index === 6) && (
 												<Divider />
 											)
 										}

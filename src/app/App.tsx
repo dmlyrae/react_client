@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useState } from 'react'
+import { Suspense, useEffect } from 'react'
 import "src/app/styles/App.css"
 import { classNames } from 'src/shared/lib/classNames/classNames'
 import AppRouter from './providers/router/RouterProvider'
@@ -22,11 +22,12 @@ function App() {
 			navigate('/login', {replace: true})
 		}
 		if (!currentUser.role || currentUser.role === 'anonymous') {
-			dispatch(userAuthByJWT())
+			dispatch(userAuthByJWT({}))
 		} 
 		if (auth && currentUser.role !== "admin") {
 			navigate('/requests', {replace: true})
 		}
+		navigate('/login', {replace: true})
 	}, [currentUser.role, auth, jwtFailed])
 	return (
 		<div 

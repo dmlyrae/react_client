@@ -5,7 +5,7 @@ interface ErrorBoundaryProps {
     children: React.ReactNode
 }
 
-type ReactInstance = Component<any> | Element;
+// type ReactInstance = Component<any> | Element;
 
 interface ErrorBoundaryState {
     hasError: boolean
@@ -18,7 +18,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   }
 
   static getDerivedStateFromError(error:Error) {
-    return { hasError: true };
+    return { hasError: true, error: error?.message ?? "Unknown Error" };
   }
 
   componentDidCatch(error:Error, errorInfo:ErrorInfo) {

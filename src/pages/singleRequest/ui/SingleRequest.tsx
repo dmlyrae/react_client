@@ -1,13 +1,13 @@
 import { classNames } from 'src/shared/lib/classNames/classNames'
 import cl from './SingleRequest.module.scss';
 import React, { useMemo, type PropsWithChildren } from 'react';
-import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { TCommonWish, TRequestCategory, TRequestEntity, TRequestResponse } from 'src/app/types/IMenu';
 import { useQuery } from 'react-query';
 import api from 'src/shared/api/api';
 import { Loader } from 'src/shared/ui/loader/Loader';
 import { IUser } from 'src/app/types/IUser';
-import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Divider, Paper, Button } from '@mui/material';
+import { Box, List, ListItem, ListItemText, Divider, Paper, Button } from '@mui/material';
 
 interface SingleRequestProps {
 	className?: string;
@@ -35,9 +35,10 @@ export function SingleRequest(props: PropsWithChildren<SingleRequestProps>) {
 
 	const trueRequest:TFullRequest|undefined = useMemo(() => {
 		if (!params.id) return undefined;
+		console.log('dbRequests', dbRequests)
 		let r!:TFullRequest;
 		if (Array.isArray(dbRequests)) {
-			r = dbRequests.find( req => req.id === params.id);
+			r = dbRequests.find( req => req.id == params.id);
 		} else {
 			r = dbRequests;
 		}
@@ -56,8 +57,8 @@ export function SingleRequest(props: PropsWithChildren<SingleRequestProps>) {
 		return trueRequest.user;
 	}, [params.id, trueRequest, user]) 
 
-	console.log('trueRequest', trueRequest)
-	console.log('trueUser', trueUser)
+	// console.log('trueRequest', trueRequest)
+	// console.log('trueUser', trueUser)
 
 	return isSuccessRequest && trueRequest && trueUser ? (
 		<>

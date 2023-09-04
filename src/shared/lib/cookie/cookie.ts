@@ -20,6 +20,7 @@ export function setCookie(name:string, value:string, props:CookieProps = {}) {
 
 	value = encodeURIComponent(value); 
 
+	console.log('new props', newProps);
 	let updatedCookie:string = name + '=' + value; 
 	for (const propName in newProps) { 
 		updatedCookie += '; ' + propName; 
@@ -33,6 +34,7 @@ export function setCookie(name:string, value:string, props:CookieProps = {}) {
 
 export function removeCookie (name: string) {
 	const cookie = document.cookie.split(";")
+		.map( c => c.trim() )
 		.find( c => c.startsWith(`${name}=`) );
 	if (cookie) {
 		document.cookie = cookie + ";expires=" + new Date().toUTCString()

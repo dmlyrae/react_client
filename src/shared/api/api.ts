@@ -1,7 +1,7 @@
 //import { RequestOptions } from "https"
-import { getCookie, setCookie, removeCookie } from "typescript-cookie";
+import { getCookie } from "typescript-cookie";
 import { apiUrl as defaultApiUrl } from "./data"
-import { INewUser, IUser } from "src/app/types/IUser";
+import { INewUser } from "src/app/types/IUser";
 import { TCategory, TRequest } from "src/app/types/IMenu";
 
 type TMethods = "GET" | "POST" | "PUT" | "DELETE";
@@ -23,13 +23,13 @@ class API {
 	}
 
 	private getCookie = getCookie;
-	private setCookie = setCookie;
-	private removeCookie = removeCookie
+	// private setCookie = setCookie;
+	// private removeCookie = removeCookie
 
 	private checkResponse = (response:Response) => {
-		console.log('response', response)
+		// console.log('response', response)
 		if (response.ok) return response.json();
-		console.log('response not ok');
+		// console.error('response not ok');
 		throw Error('Response error: ' + response.status);
 	}
 
@@ -39,7 +39,7 @@ class API {
 	}
 
 	private request = (action:string, props:IRequestProps) => {
-		console.log('request', action, props)
+		// console.log('request', action, props)
 		const { settings, notAuth, validate, token, headers, ...options } = props;
 
 		let accessToken = token ?? this._accessToken;

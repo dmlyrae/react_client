@@ -1,6 +1,7 @@
-import {Action, createSlice, PayloadAction} from "@reduxjs/toolkit";
+import { createSlice, PayloadAction} from "@reduxjs/toolkit";
 import { userAuth, userAuthByJWT, userGetAll, userLogout } from "../actions/userActions";
 import { IUser, unAuthorized } from "src/app/types/IUser";
+import { removeCookie } from "src/shared/lib/cookie/cookie";
 
 interface IUsersState {
 	currentUser: IUser;
@@ -39,9 +40,19 @@ const initialState:IUsersState = {
 export const userSlice = createSlice({
 	name: 'user',
 	initialState,
-	reducers: { },
+	reducers: {
+		logout: (state) => {
+			state.auth = false;
+			state.currentUser = {
+				login: 'anonymous',
+				id: unAuthorized,
+				role: 'anonymous',
+			};
+			removeCookie("accessToken");
+		}
+	},
 	extraReducers: (builder) => {
-		builder.addCase(userLogout.fulfilled.type, (state, action: Action) => {
+		builder.addCase(userLogout.fulfilled.type, (state) => {
 			state.currentUser = {
 				login: 'anonymous',
 				id: unAuthorized,
@@ -75,6 +86,7 @@ export const userSlice = createSlice({
 				role: 'anonymous',
 				id: unAuthorized,
 			}
+			state.error = action.payload?.error ?? "Auth error";
 		})
 
 		builder.addCase(userAuth.fulfilled.type, (state, action:PayloadAction<{user: IUser, token: string }>) => {
@@ -99,7 +111,7 @@ export const userSlice = createSlice({
 					id: unAuthorized,
 				}
 			}
-			console.log('user auth')
+			// console.log('user auth')
 		})
 
 	}

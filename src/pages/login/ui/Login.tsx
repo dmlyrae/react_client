@@ -1,9 +1,9 @@
 import { classNames } from "src/shared/lib/classNames/classNames"
 import cl from './Login.module.scss'
-import { useState, type PropsWithChildren, useEffect } from 'react'
+import { type PropsWithChildren, useEffect } from 'react'
 import { useForm } from "src/shared/lib/hooks/useForm"
 import { useAppDispatch, useAppSelector } from "src/shared/lib/hooks/redux"
-import { userAuth, userGetAll } from "src/app/actions/userActions"
+import { userAuth } from "src/app/actions/userActions"
 import { dummyUser } from "src/shared/api/data"
 import { useNavigate } from "react-router-dom"
 
@@ -35,6 +35,9 @@ export function Login(props: PropsWithChildren<LoginProps>) {
 	useEffect(() => {
 		if (auth && currentUser.role !== "admin") {
 			navigate('/requests', {replace: true})
+		}
+		if (auth && currentUser.role === "admin") {
+			navigate('/admin', {replace: true})
 		}
 	}, [currentUser.role, auth])
 

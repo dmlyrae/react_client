@@ -1,16 +1,16 @@
 import { classNames } from 'src/shared/lib/classNames/classNames'
 import cl from './RequestCreate.module.scss';
 import React, { useReducer, type PropsWithChildren, useState, useEffect } from 'react';
-import { FormGroup, Box, TextField, MenuItem, Button, List, ListSubheader, Collapse, ListItemButton, ListItemIcon, ListItemText, Stack } from '@mui/material';
-import { useForm } from 'src/shared/lib/hooks/useForm';
+import { FormGroup, Box, TextField, MenuItem, Button, List, ListSubheader, Collapse, ListItemButton, ListItemIcon, ListItemText, Stack, Divider } from '@mui/material';
 import { TCategory, TEntity } from 'src/app/types/IMenu';
-import { ExpandLess, ExpandMore, StarBorder } from '@mui/icons-material';
+import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import CategoryIcon from '@mui/icons-material/Category';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import { useQuery } from 'react-query';
 import api from 'src/shared/api/api';
 import { getErrorMessage } from 'src/shared/api/getErrorMessage';
 import SubdirectoryArrowRightIcon from '@mui/icons-material/SubdirectoryArrowRight';
+import LoadingButton from '@mui/lab/LoadingButton';
 
 const defaultCat = {
 	name: "",
@@ -32,6 +32,8 @@ interface RequestCreateProps {
 export function RequestCreate(props: PropsWithChildren<RequestCreateProps>) {
 
 	const { className } = props;
+
+	const [ savingMenu, setSavingMenu ] = useState<boolean>(false);
 
 	const reducer = (state:TCategory[], action: {type: string, payload: TEntity | TCategory | TCategory[]}) => {
 		const { type, payload } = action;
@@ -80,37 +82,39 @@ export function RequestCreate(props: PropsWithChildren<RequestCreateProps>) {
 
 	const [ menu, dispatchMenu ] = useReducer(reducer, [])
 
-	const onSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
-		e.stopPropagation();
-		console.log('---', e.currentTarget)
-	}
+	// const onSubmit = (e: React.FormEvent) => {
+	// 	e.preventDefault();
+	// 	e.stopPropagation();
+	// 	console.log('---', e.currentTarget)
+	// }
 
 	const [ newCat, setNewCat ] = useState<TCategory>({...defaultCat});
 	const [ newEntity, setNewEntity ] = useState<TEntity>({...defaultEnt})
 
-	const changeCatValue = function (name: string) {
+	const changeCatValue = function (name: string | string[]) {
 		return function (e: React.ChangeEvent<HTMLInputElement>) {
 			const value = e?.currentTarget?.value ?? e?.target?.value ?? undefined;
 			if (typeof value === "undefined") return;
-			setNewCat( prev => ({
-				...prev,
-				[name]: value,
-			}))
+			const names = Array.isArray(name) ? name : [name];
+			names.forEach( n => 
+				setNewCat( prev => ({
+					...prev,
+					[n]: value,
+				}))
+			)
 		}
 	}
 	
-	const changeEntityValue = function (name: string) {
+	const changeEntityValue = function (name: string | string[]) {
 		return function (e: React.ChangeEvent<HTMLInputElement>) {
 			e.preventDefault()
-			// console.log('name', name)
-			// console.log('target', e.target)
-			// console.log('target', e.currentTarget)
-			// console.log('value', e.currentTarget.value)
-			setNewEntity( prev => ({
-				...prev,
-				[name]: e?.currentTarget?.value ?? e.target.value
-			}))
+			const names = Array.isArray(name) ? name : [name];
+			names.forEach( n => 
+				setNewEntity( prev => ({
+					...prev,
+					[n]: e?.currentTarget?.value ?? e.target.value
+				}))
+			)
 		}
 	}
 
@@ -136,7 +140,7 @@ export function RequestCreate(props: PropsWithChildren<RequestCreateProps>) {
 	}
 
 	const [ openList, setOpenList ] = useState<boolean[]>([]);
-	const { data:currentMenu, isLoading } = useQuery('menu', api.currentMenuGet)
+	const { data:currentMenu } = useQuery('menu', api.currentMenuGet)
 
 	useEffect(() => {
 		if (!currentMenu) return;
@@ -159,10 +163,12 @@ export function RequestCreate(props: PropsWithChildren<RequestCreateProps>) {
 
 	const save = async (e: React.MouseEvent) => {
 		e.stopPropagation();
+		setSavingMenu( _ => true );
 		const result = await api.currentMenuUpdate({
 			id: currentMenu?.id,
 			menu: menu, 
 		});
+		setSavingMenu( _ => false );
 		console.log('saved', result);
 	}
 
@@ -206,12 +212,17 @@ export function RequestCreate(props: PropsWithChildren<RequestCreateProps>) {
 								</ListItemButton>	
 							</Stack>
 
-
 							<Collapse in={openList[i]} timeout="auto" unmountOnExit>
 								<List component="div" disablePadding>
 									{
 										category.entities.map( (entity,ii) => (
-											<Stack spacing={{ xs: 1, sm: 2 }} direction="row" useFlexGap flexWrap="wrap">
+											<Stack 
+												spacing={{ xs: 1, sm: 2 }} 
+												direction="row" 
+												useFlexGap 
+												flexWrap="wrap"
+												key={ii}
+											>
 
 												<Button 
 													onClick={ () => dispatchMenu({type: "remove", payload: entity}) } 
@@ -252,13 +263,17 @@ export function RequestCreate(props: PropsWithChildren<RequestCreateProps>) {
 				noValidate
 				autoComplete="off"
 			>
-				<div>
+				<Stack
+					direction="row"
+					divider={<Divider orientation="vertical" flexItem />}
+					spacing={2}	
+				>
 					<TextField
 						id="category"
 						name='category'
 						label="Display name"
 						value={newCat.label}
-						onChange={changeCatValue("label")}
+						onChange={changeCatValue(["label", "name"])}
 						helperText="Category Display Name"
 					/>
 					<TextField
@@ -266,6 +281,7 @@ export function RequestCreate(props: PropsWithChildren<RequestCreateProps>) {
 						name='category'
 						label="Server name"
 						value={newCat.name}
+						style={{display: "none"}}
 						onChange={changeCatValue("name")}
 						helperText="Category Server Name"
 					/>
@@ -278,7 +294,7 @@ export function RequestCreate(props: PropsWithChildren<RequestCreateProps>) {
 					>
 						{"Category Add"}
 					</Button>
-				</div>
+				</Stack>
 			</Box>
 		</FormGroup>
 		<FormGroup 
@@ -292,13 +308,17 @@ export function RequestCreate(props: PropsWithChildren<RequestCreateProps>) {
 				noValidate
 				autoComplete="off"
 			>
-				<div>
+				<Stack
+					direction="row"
+					divider={<Divider orientation="vertical" flexItem />}
+					spacing={2}	
+				>
 					<TextField
 						id="entitylabel"
 						name='entitylabel'
-						label="Add entity"
+						label="Название элемента"
 						value={newEntity.label}
-						onChange={changeEntityValue("label")}
+						onChange={changeEntityValue(["label", "name"])}
 						helperText="Entity Display Name"
 					/>
 					<TextField
@@ -306,6 +326,7 @@ export function RequestCreate(props: PropsWithChildren<RequestCreateProps>) {
 						name='entityname'
 						label="Add entity"
 						value={newEntity.name}
+						style={{display: "none"}}
 						onChange={changeEntityValue("name")}
 						helperText="Entity Server Name"
 					/>
@@ -313,14 +334,14 @@ export function RequestCreate(props: PropsWithChildren<RequestCreateProps>) {
 						id="entitycat"
 						select
 						name='entitycat'
-						label="Add entity"
+						label="Категория элемента"
 						value={newEntity.category}
 						onChange={changeEntityValue("category")}
 						helperText="Entity Category"
 					>
-						{menu.map((cat) => (
+						{menu.map((cat,i) => (
 							<MenuItem 
-								key={cat.name} 
+								key={i} 
 								value={cat.name}
 							>
 								{cat.label}
@@ -344,15 +365,21 @@ export function RequestCreate(props: PropsWithChildren<RequestCreateProps>) {
 					>
 						{"Entity Add"}
 					</Button>
-				</div>
+				</Stack>
 			</Box>
 		</FormGroup>
-		<Button 
-			variant="contained"
-			onClick={save}
+		<article
+			className={cl["button-row"]}
 		>
-			{"Save"}
-		</Button>
+			<LoadingButton
+				variant="contained"
+				onClick={save}
+				loading={savingMenu}
+				fullWidth
+			>
+				{"Save"}
+			</LoadingButton>
+		</article>
 	</>
 	)
 }

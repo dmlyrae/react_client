@@ -4,15 +4,14 @@ import React, { useMemo, type PropsWithChildren, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import api from 'src/shared/api/api';
 import { Loader } from 'src/shared/ui/loader/Loader';
-import { TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, Button, Checkbox, ButtonGroup, Stack } from '@mui/material';
-import { TRequest, TRequestResponse } from 'src/app/types/IMenu';
-import { INewUser, IUser } from 'src/app/types/IUser';
+import { TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, Button, Checkbox, Stack } from '@mui/material';
+import { TRequestResponse } from 'src/app/types/IMenu';
 import moment from 'moment';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import { adminSlice } from 'src/app/reducers/AdminSlice';
 import { useNavigate } from 'react-router-dom';
 import HourglassTopIcon from '@mui/icons-material/HourglassTop';
 import DoneOutlineIcon from '@mui/icons-material/DoneOutline';
+import { IUser } from 'src/app/types/IUser';
 
 interface RequestsListProps {
 	className?: string;
@@ -21,8 +20,8 @@ interface RequestsListProps {
 export function RequestsList(props: PropsWithChildren<RequestsListProps>) {
 
 	const { className } = props;
-	const { data: requests, isLoading: isLoadingRequests, isSuccess: IsSuccessRequests } = useQuery('requests', api.getAllRequests )
-	const { data: users, isLoading: isLoadingUsers, isSuccess: isSuccessUsers } = useQuery('users', api.getAllUsers )
+	const { data: requests, isLoading: isLoadingRequests,  } = useQuery('requests', api.getAllRequests )
+	const { data: users, isLoading: isLoadingUsers,  } = useQuery('users', api.getAllUsers )
 	const navigate = useNavigate()
 
 	const queryClient = useQueryClient()
@@ -30,7 +29,7 @@ export function RequestsList(props: PropsWithChildren<RequestsListProps>) {
 	const mutationRequest = useMutation( 
 		(id:string) => api.deleteRequest(id),
 		{
-			onSuccess: (id:string) => {
+			onSuccess: () => {
 				queryClient.invalidateQueries(["requests"])
 			}
 		}
@@ -39,7 +38,7 @@ export function RequestsList(props: PropsWithChildren<RequestsListProps>) {
 	const mutationDoneRequest = useMutation( 
 		(ids:string[]) => api.checkmarkRequests(ids),
 		{
-			onSuccess: (id:string) => {
+			onSuccess: () => {
 				queryClient.invalidateQueries(["requests"])
 				setChecked( prev => prev.map( _ => false))
 			}
@@ -54,7 +53,7 @@ export function RequestsList(props: PropsWithChildren<RequestsListProps>) {
 		}, {})
 	}, [users]);
 
-	const [typeSort, setTypeSort] = useState<string>("processed");
+	const [ typeSort ] = useState<string>("processed");
 	const sortedRequests = useMemo(() => {
 		if (!Array.isArray(requests)) return [];
 		if (typeSort === "processed") {
@@ -71,6 +70,7 @@ export function RequestsList(props: PropsWithChildren<RequestsListProps>) {
 
 	const checkRequest = function(index: number) {
 		return function(e : React.ChangeEvent) {
+			e.stopPropagation();
 			setChecked( prev => {
 					const newState = Array.from({length: Math.max((sortedRequests?.length ?? 0), checked.length, index)}, 
 						(_,i) => prev[i] ?? false);

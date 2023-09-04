@@ -4,18 +4,18 @@ import { useMemo, type PropsWithChildren, useState, useReducer, useEffect } from
 import { Loader } from 'src/shared/ui/loader/Loader';
 import { useQuery } from 'react-query';
 import api from 'src/shared/api/api';
-import { TCategory, TCommonWish, TRequest, TRequestCategory, TRequestEntity } from 'src/app/types/IMenu';
+import { TCategory, TCommonWish, TRequest, TRequestEntity } from 'src/app/types/IMenu';
 import { getErrorMessage } from 'src/shared/api/getErrorMessage';
-import { ExpandLess, ExpandMore, StarBorder } from '@mui/icons-material';
-import { Box, List, ListSubheader, Stack, Button, ListItemIcon, ListItemButton, ListItemText, Collapse, TextField } from '@mui/material';
+import { ExpandLess, ExpandMore } from '@mui/icons-material';
+import { Box, List, ListSubheader, Stack, Button, ListItemIcon, ListItemButton, ListItemText, Collapse, TextField, Typography } from '@mui/material';
 import React from 'react';
-import { useAppDispatch } from 'src/shared/lib/hooks/redux';
 import CategoryIcon from '@mui/icons-material/Category';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import SendIcon from '@mui/icons-material/Send';
 import LoopIcon from '@mui/icons-material/Loop';
 import AddCommentIcon from '@mui/icons-material/AddComment';
+import { LoadingButton } from '@mui/lab';
 
 const initialState:TRequest = {
 	menu: [],
@@ -30,7 +30,6 @@ interface RequestsProps {
 export function Requests(props: PropsWithChildren<RequestsProps>) {
 
 	const { className } = props;
-	const dispatch = useAppDispatch();
 	const { data:lastMenu, isLoading } = useQuery('menu', api.currentMenuGet)
 	const [ openList, setOpenList ] = useState<boolean[]>([]);
 
@@ -140,17 +139,21 @@ export function Requests(props: PropsWithChildren<RequestsProps>) {
 	}, [menu])
 
 
-	const [ isSending, setIsSending ] = useState<boolean>(false);
+	const [ isSending, setIsSending ] = useState<number>(0);
 	const [ error, setError ] = useState<string>("");
 
 	const sendRequest = async (e: React.MouseEvent) => {
 		e.stopPropagation()
 		e.preventDefault()
 		if (isSending) return;
-		setIsSending(true);
+		setIsSending( _ => 1);
 		const result = await api.createRequest(request);
-		setIsSending(false);
-		setError( () => result.error ?? "");
+		if (result.error) {
+			setIsSending( _ => 3);
+			setError( () => result.error ?? "");
+		} else {
+			setIsSending( _ => 2);
+		}
 		if (!error) {
 			dispatchRequest({type: "reset", payload: null})
 		}
@@ -173,13 +176,19 @@ export function Requests(props: PropsWithChildren<RequestsProps>) {
 
 	return isLoading || !Array.isArray(request?.menu) ? (
 		<Loader />
+	) : isSending === 2 ? (
+		<Typography variant="h1" component="h2">
+			{"Заявка отправлена"}
+		</Typography>
 	) : (
 	<>
-		<h1 className={"h1"}>Category List</h1>
+		<h1 className={"h1"}>
+			{"Заявка"}
+		</h1>
 		<Box
 			alignContent={"center"}
 			width={"100%"}
-			className={cl["Requests"]}
+			className={classNames(cl["Requests"], {}, [className])}
 		>
 			{/* MAIN FORM LIST */}
 
@@ -192,7 +201,7 @@ export function Requests(props: PropsWithChildren<RequestsProps>) {
 						component="div" 
 						style={{alignItems: "center", display: "flex", justifyContent: "center"}} 
 					>
-						{"Menu items"}
+						{"Доступные позиции"}
 					</ListSubheader>
 				}
 			>
@@ -339,16 +348,18 @@ export function Requests(props: PropsWithChildren<RequestsProps>) {
 					</ListItemIcon>
 				</Button>	
 			</Stack>
-			<Button 
+			<LoadingButton 
 				variant="contained" 
-				endIcon={isSending ? <LoopIcon /> : <SendIcon />}
+				// endIcon={isSending ? <LoopIcon /> : <SendIcon />}
 				onClick={sendRequest}
+				loading={isSending === 1}
+				fullWidth
 				style={{
 					marginTop: 30
 				}}
 			>
-        		Send
-      		</Button>
+				{"Отправить"}
+      		</LoadingButton>
 		</Box>
 	</>
 	)

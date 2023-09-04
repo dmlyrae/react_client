@@ -1,6 +1,6 @@
-export const apiUrl = `http://127.0.0.1:8000/api`;
+export const apiUrl = 'http://dmlyra9j.beget.tech/api';
 
 export const dummyUser = {
-    login: 'dm',
+    login: 'admin',
     password: '101215',
 }

@@ -3,14 +3,13 @@ import cl from './UsersList.module.scss';
 import type { PropsWithChildren } from 'react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import api from 'src/shared/api/api';
-import { INewUser, IUser } from 'src/app/types/IUser';
+import { IUser } from 'src/app/types/IUser';
 import { TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody } from '@mui/material';
 import { Button } from 'src/shared/ui/button/Button';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import React from 'react';
 import { useAppDispatch } from 'src/shared/lib/hooks/redux';
 import { adminSlice } from 'src/app/reducers/AdminSlice';
-import { ApiOutlined } from '@mui/icons-material';
 
 interface UsersListProps {
 	className?: string;
@@ -24,7 +23,7 @@ export function UsersList(props: PropsWithChildren<UsersListProps>) {
 	const mutation = useMutation( 
 		(id:string) => api.deleteUser(id),
 		{
-			onSuccess: (id:string) => {
+			onSuccess: () => {
 				queryClient.invalidateQueries(["users"])
 				dispatch(adminSlice.actions.changeTab(1))
 			}

@@ -15,7 +15,7 @@ export enum ThemeButton {
 	REMOVE = 'remove',
 }
 
-const validtypes = ["reset", "button", "submit", "remove"];
+// const validtypes = ["reset", "button", "submit", "remove"];
 
 export function Button (props: PropsWithChildren<ButtonProps>) {
 	const {

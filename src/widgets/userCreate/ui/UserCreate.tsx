@@ -1,7 +1,7 @@
 import { classNames } from 'src/shared/lib/classNames/classNames'
 import cl from './UserCreate.module.scss';
 import type { PropsWithChildren } from 'react';
-import { Box, TextField, MenuItem, Button, FormControl, FormGroup } from '@mui/material';
+import { Box, TextField, MenuItem, Button, FormGroup } from '@mui/material';
 import React from 'react';
 import { useForm } from 'src/shared/lib/hooks/useForm';
 import api from 'src/shared/api/api';
